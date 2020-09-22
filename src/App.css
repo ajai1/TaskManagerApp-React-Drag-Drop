@@ -8,8 +8,9 @@
   height: 10%;
   background-color: rgb(255, 115, 0);
   display: flex;
+  flex-direction: row;
   padding: 10px;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
 }
 
@@ -28,5 +29,39 @@
   height: 350px;
 }
 
-.group__container {
+.showComplete,
+.showProgress,
+.showAll {
+  font-size: 25px;
+  float: left;
+  margin-right: 10px;
+}
+
+.showComplete:hover,
+.showProgress:hover,
+.showAll:hover {
+  display: inline-block;
+  border-radius: 5px;
+  line-height: 25px;
+  transition: all 0.4s;
+  background-color: rgba(255, 255, 255, 0.726);
+}
+
+.showComplete:hover::after,
+.showProgress:hover::after,
+.showAll:hover::after {
+  content: " Show Completed Tasks ";
+  position: absolute;
+  font-size: 20px;
+  background-color: rgba(255, 255, 255, 0.726);
+  top: 65px;
+  left: 10px;
+}
+
+.showProgress:hover::after {
+  content: "Show In Progress Tasks";
+}
+
+.showAll:hover::after {
+  content: " Show All Tasks ";
 }

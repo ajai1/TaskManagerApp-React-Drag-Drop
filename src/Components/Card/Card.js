@@ -1,19 +1,31 @@
 import React, { useState } from "react";
 import "./Card.css";
 
-const Card = ({ task, id, titleHandler, bodyHandler, closeHandler }) => {
+const Card = ({
+  task,
+  id,
+  titleHandler,
+  bodyHandler,
+  closeHandler,
+  stageHandler,
+}) => {
   const dragstart = (e) => {
     const target = e.target;
     e.dataTransfer.setData("card_id", target.id);
+    target.className = "notesWrapper dragging";
     console.log("target Id - ", target.id);
     setTimeout(() => {
       target.style.display = "none";
     }, 0);
   };
 
+  const dragEnd = (e) => {
+    e.target.className = "notesWrapper";
+  };
+
   const dragover = (e) => e.stopPropagation();
 
-  const [color, setColorClass] = useState("setColorYellow");
+  const [color, setColorClass] = useState(task.stage);
 
   return (
     <div
@@ -21,20 +33,21 @@ const Card = ({ task, id, titleHandler, bodyHandler, closeHandler }) => {
       draggable
       onDragStart={dragstart}
       onDragOver={dragover}
+      onDragEnd={dragEnd}
       id={id}
     >
       <div className="notes">
-        <div className={"note " + color}>
+        <div className={"note " + task.stage}>
           <div className="note__header">
             <span
               className="note__check"
-              onClick={(e) => setColorClass("setColorOrange")}
+              onClick={(e) => stageHandler("inprogress", id)}
             >
               <i className="fa fa-tasks" aria-hidden="true"></i>
             </span>
             <span
               className="note__check"
-              onClick={(e) => setColorClass("setColorGreen")}
+              onClick={(e) => stageHandler("complete", id)}
             >
               <i className="fa fa-check" aria-hidden="true"></i>
             </span>

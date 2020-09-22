@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom";
 
 import "./App.css";
@@ -10,11 +10,11 @@ function App() {
       title: "Enter a Title",
       body: "Enter the body",
       id: Date.now(),
+      stage: "todo",
     },
   ]);
 
-  const containerRef = useRef();
-  const [render, setRender] = useState(false);
+  const [stageToShow, setStageToShow] = useState("");
 
   const titleHandler = (title, id) => {
     const allTasks = tasks.map((task) => {
@@ -36,12 +36,23 @@ function App() {
     setTasks(allTasks);
   };
 
+  const stageHandler = (stage, id) => {
+    const allTasks = tasks.map((task) => {
+      if (task.id === id) {
+        task.stage = stage;
+      }
+      return task;
+    });
+    setTasks(allTasks);
+  };
+
   const addNewCard = () => {
     const allTasks = [...tasks];
     allTasks.push({
       title: "Enter a Title",
       body: "Enter the body",
       id: Date.now(),
+      stage: "todo",
     });
     setTasks(allTasks);
   };
@@ -64,59 +75,110 @@ function App() {
         return false;
       }
     });
-
     setTasks(allTasks);
-
-    console.log("all Task");
-    console.log(tasks);
   };
 
   const drop = (e) => {
-    e.preventDefault();
-    const card_id = e.dataTransfer.getData("card_id");
-    const card = document.getElementById(card_id);
-    const containerDiv = document.getElementById("containerDiv");
-
-    if (!e.target) {
-      console.log("empty");
+    if (!e.preventDefault()) {
+      e.preventDefault();
+      const card_id = e.dataTransfer.getData("card_id");
+      const card = document.getElementById(card_id);
+      const containerDiv = document.getElementById("containerDiv");
+      const addNewCard = document.getElementById("addNewCard");
+      const afterElement = getDragAfterElement(
+        containerDiv,
+        e.clientX,
+        e.clientY
+      );
+      if (card) {
+        card.style.display = "block";
+        ReactDOM.unmountComponentAtNode(addNewCard);
+        if (afterElement == null) {
+          containerDiv.appendChild(card);
+        } else {
+          containerDiv.insertBefore(card, afterElement);
+        }
+        containerDiv.appendChild(addNewCard);
+      }
     }
-    if (card) {
-      card.style.display = "block";
-      containerDiv.appendChild(card);
-    }
-    console.log("empty");
-    console.log(containerDiv);
   };
+
+  function getDragAfterElement(container, x, y) {
+    const draggableElements = [
+      ...container.querySelectorAll(
+        ".notesWrapper:not(.dragging):not(.new__note)"
+      ),
+    ];
+
+    return draggableElements.reduce(
+      (closest, child) => {
+        const box = child.getBoundingClientRect();
+        const offsetX = x - (box.left + box.width / 2);
+        const offsetY = y - (box.top + box.height / 2);
+        const offset = (offsetX + offsetY) / 2;
+
+        if (offset < 0 && offset > closest.offset) {
+          return { offset: offset, element: child };
+        } else {
+          return closest;
+        }
+      },
+      { offset: Number.NEGATIVE_INFINITY }
+    ).element;
+  }
+
   const dragOver = (e) => e.preventDefault();
 
   return (
     <div className="App">
       <div className="header">
+        <div>
+          <span className="showComplete">
+            <i
+              onClick={() => setStageToShow("complete")}
+              className="fas fa-check-circle"
+            ></i>
+          </span>
+          <span className="showProgress">
+            <i
+              onClick={() => setStageToShow("inprogress")}
+              className="fas fa-tasks"
+            ></i>
+          </span>
+          <span className="showAll">
+            <i onClick={() => setStageToShow("")} className="fas fa-eye"></i>
+          </span>
+        </div>
+
         <h1>Task Manager Application</h1>
       </div>
 
       <div
         className="container"
         id="containerDiv"
-        ref={containerRef}
         onDrop={drop}
         onDragOver={dragOver}
       >
         {tasks.map((task, id) => {
-          return (
-            <Card
-              key={task.id}
-              task={task}
-              id={task.id}
-              titleHandler={titleHandler}
-              bodyHandler={bodyHandler}
-              closeHandler={closeHandler}
-            />
-          );
+          if (task.stage === stageToShow || stageToShow == "") {
+            return (
+              <Card
+                key={task.id}
+                task={task}
+                id={task.id}
+                stageHandler={stageHandler}
+                titleHandler={titleHandler}
+                bodyHandler={bodyHandler}
+                closeHandler={closeHandler}
+              />
+            );
+          } else {
+            return null;
+          }
         })}
         <div id="addNewCard" className="notesWrapper">
           <div className="notes">
-            <div className="note new__note setColorYellow" onClick={addNewCard}>
+            <div className="note new__note todo" onClick={addNewCard}>
               <span>
                 <i className="fas fa-plus"></i>
               </span>
