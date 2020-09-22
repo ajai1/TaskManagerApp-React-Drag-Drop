@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import "./Card.css";
 
 const Card = ({
@@ -9,6 +9,8 @@ const Card = ({
   closeHandler,
   stageHandler,
 }) => {
+  //draggable events -----------------------------------------------------------
+
   const dragstart = (e) => {
     const target = e.target;
     e.dataTransfer.setData("card_id", target.id);
@@ -25,7 +27,7 @@ const Card = ({
 
   const dragover = (e) => e.stopPropagation();
 
-  const [color, setColorClass] = useState(task.stage);
+  //~draggable events -----------------------------------------------------------
 
   return (
     <div
@@ -43,13 +45,13 @@ const Card = ({
               className="note__check"
               onClick={(e) => stageHandler("inprogress", id)}
             >
-              <i className="fa fa-tasks" aria-hidden="true"></i>
+              <i className="fa fa-tasks"></i>
             </span>
             <span
               className="note__check"
               onClick={(e) => stageHandler("complete", id)}
             >
-              <i className="fa fa-check" aria-hidden="true"></i>
+              <i className="fa fa-check"></i>
             </span>
 
             <span className="note__close" onClick={() => closeHandler(task.id)}>

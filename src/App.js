@@ -1,20 +1,24 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import ReactDOM from "react-dom";
 
 import "./App.css";
 import Card from "./Components/Card/Card";
+import Header from "./Components/Header/Header";
 
 function App() {
   const [tasks, setTasks] = useState([
     {
-      title: "Enter a Title",
-      body: "Enter the body",
+      title: "Enter a Task Header",
+      body:
+        'Description here \n<-- Use the icons to set the task \n "In-progress" or "Completed" -->',
       id: Date.now(),
       stage: "todo",
     },
   ]);
 
   const [stageToShow, setStageToShow] = useState("");
+
+  //components input change handlers ---------------------------------------------------------
 
   const titleHandler = (title, id) => {
     const allTasks = tasks.map((task) => {
@@ -49,8 +53,9 @@ function App() {
   const addNewCard = () => {
     const allTasks = [...tasks];
     allTasks.push({
-      title: "Enter a Title",
-      body: "Enter the body",
+      title: "Enter a Task Header",
+      body:
+        'Enter the description \nUse the icons above to set the task "In-progress" or "Completed"',
       id: Date.now(),
       stage: "todo",
     });
@@ -78,6 +83,7 @@ function App() {
     setTasks(allTasks);
   };
 
+  //drag - drop functions ------------------------------------------------------------------------
   const drop = (e) => {
     if (!e.preventDefault()) {
       e.preventDefault();
@@ -109,7 +115,6 @@ function App() {
         ".notesWrapper:not(.dragging):not(.new__note)"
       ),
     ];
-
     return draggableElements.reduce(
       (closest, child) => {
         const box = child.getBoundingClientRect();
@@ -128,30 +133,13 @@ function App() {
   }
 
   const dragOver = (e) => e.preventDefault();
+  //~drag - drop functions ------------------------------------------------------------------------
+
+  //JSX Component ------------------------------------------------------------------------
 
   return (
     <div className="App">
-      <div className="header">
-        <div>
-          <span className="showComplete">
-            <i
-              onClick={() => setStageToShow("complete")}
-              className="fas fa-check-circle"
-            ></i>
-          </span>
-          <span className="showProgress">
-            <i
-              onClick={() => setStageToShow("inprogress")}
-              className="fas fa-tasks"
-            ></i>
-          </span>
-          <span className="showAll">
-            <i onClick={() => setStageToShow("")} className="fas fa-eye"></i>
-          </span>
-        </div>
-
-        <h1>Task Manager Application</h1>
-      </div>
+      <Header setStageToShow={setStageToShow} />
 
       <div
         className="container"
@@ -160,7 +148,7 @@ function App() {
         onDragOver={dragOver}
       >
         {tasks.map((task, id) => {
-          if (task.stage === stageToShow || stageToShow == "") {
+          if (task.stage === stageToShow || stageToShow === "") {
             return (
               <Card
                 key={task.id}
@@ -176,15 +164,17 @@ function App() {
             return null;
           }
         })}
-        <div id="addNewCard" className="notesWrapper">
-          <div className="notes">
-            <div className="note new__note todo" onClick={addNewCard}>
-              <span>
-                <i className="fas fa-plus"></i>
-              </span>
+        {stageToShow === "" ? (
+          <div id="addNewCard" className="notesWrapper">
+            <div className="notes">
+              <div className="note new__note todo" onClick={addNewCard}>
+                <span>
+                  <i className="fas fa-plus"></i>
+                </span>
+              </div>
             </div>
           </div>
-        </div>
+        ) : null}
       </div>
     </div>
   );
